@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GSA LiteLLM Manager</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>GSA LiteLLM Manager</h1>
+    <div class="api-key-box">
+      <label for="app-api-key">Clé API du serveur (X-App-Api-Key)</label>
+      <input type="password" id="app-api-key" placeholder="Laisser vide si non configurée" />
+      <button id="save-api-key">Enregistrer</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="models">Modèles</button>
+    <button class="tab-btn" data-tab="chat">Chat</button>
+    <button class="tab-btn" data-tab="keys">Clés API</button>
+    <button class="tab-btn" data-tab="users">Utilisateurs</button>
+    <button class="tab-btn" data-tab="teams">Équipes</button>
+    <button class="tab-btn" data-tab="spend">Dépenses</button>
+    <button class="tab-btn" data-tab="prompts">Prompts</button>
+  </nav>
+
+  <main>
+    <!-- Modèles -->
+    <section id="tab-models" class="tab-panel active">
+      <h2>Modèles</h2>
+      <div class="actions">
+        <button data-action="list-models">Lister (/v1/models)</button>
+        <button data-action="model-info">Détails (/model/info)</button>
+      </div>
+      <form id="form-add-model" class="form-grid">
+        <h3>Ajouter un modèle</h3>
+        <input name="model_name" placeholder="Nom logique (ex: gpt-4o)" required />
+        <input name="model" placeholder="Modèle réel (ex: openai/gpt-4o)" required />
+        <input name="api_key" placeholder="Clé API du provider (optionnel)" />
+        <input name="api_base" placeholder="API base (optionnel)" />
+        <button type="submit">Ajouter</button>
+      </form>
+      <form id="form-delete-model" class="inline-form">
+        <input name="model_id" placeholder="ID du modèle à supprimer" required />
+        <button type="submit">Supprimer</button>
+      </form>
+      <div id="output-models" class="output"></div>
+    </section>
+
+    <!-- Chat -->
+    <section id="tab-chat" class="tab-panel">
+      <h2>Playground Chat</h2>
+      <form id="form-chat" class="form-grid">
+        <input name="model" placeholder="Modèle (ex: gpt-4o)" required />
+        <textarea name="message" placeholder="Votre message" rows="4" required></textarea>
+        <button type="submit">Envoyer</button>
+      </form>
+      <div id="output-chat" class="output"></div>
+    </section>
+
+    <!-- Clés API -->
+    <section id="tab-keys" class="tab-panel">
+      <h2>Clés API</h2>
+      <div class="actions">
+        <button data-action="list-keys">Lister les clés</button>
+      </div>
+      <form id="form-generate-key" class="form-grid">
+        <h3>Générer une clé</h3>
+        <input name="key_alias" placeholder="Alias (optionnel)" />
+        <input name="models" placeholder="Modèles autorisés, séparés par virgule (optionnel)" />
+        <input name="max_budget" type="number" step="0.01" placeholder="Budget max (optionnel)" />
+        <button type="submit">Générer</button>
+      </form>
+      <form id="form-delete-key" class="inline-form">
+        <input name="keys" placeholder="Clé à supprimer (sk-...)" required />
+        <button type="submit">Supprimer</button>
+      </form>
+      <div id="output-keys" class="output"></div>
+    </section>
+
+    <!-- Utilisateurs -->
+    <section id="tab-users" class="tab-panel">
+      <h2>Utilisateurs</h2>
+      <div class="actions">
+        <button data-action="list-users">Lister les utilisateurs</button>
+      </div>
+      <form id="form-create-user" class="form-grid">
+        <h3>Créer un utilisateur</h3>
+        <input name="user_email" placeholder="Email (optionnel)" />
+        <input name="user_role" placeholder="Rôle (ex: internal_user)" />
+        <input name="max_budget" type="number" step="0.01" placeholder="Budget max (optionnel)" />
+        <button type="submit">Créer</button>
+      </form>
+      <div id="output-users" class="output"></div>
+    </section>
+
+    <!-- Équipes -->
+    <section id="tab-teams" class="tab-panel">
+      <h2>Équipes</h2>
+      <div class="actions">
+        <button data-action="list-teams">Lister les équipes</button>
+      </div>
+      <form id="form-create-team" class="form-grid">
+        <h3>Créer une équipe</h3>
+        <input name="team_alias" placeholder="Nom de l'équipe" required />
+        <input name="max_budget" type="number" step="0.01" placeholder="Budget max (optionnel)" />
+        <button type="submit">Créer</button>
+      </form>
+      <div id="output-teams" class="output"></div>
+    </section>
+
+    <!-- Dépenses -->
+    <section id="tab-spend" class="tab-panel">
+      <h2>Dépenses</h2>
+      <div class="actions">
+        <button data-action="global-spend">Dépense globale</button>
+        <button data-action="spend-logs">Logs de dépense</button>
+      </div>
+      <div id="output-spend" class="output"></div>
+    </section>
+
+    <!-- Prompts -->
+    <section id="tab-prompts" class="tab-panel">
+      <h2>Prompts</h2>
+      <div class="actions">
+        <button data-action="list-prompts">Lister les prompts</button>
+      </div>
+      <form id="form-create-prompt" class="form-grid">
+        <h3>Créer un prompt</h3>
+        <input name="name" placeholder="Nom du prompt" required />
+        <input name="description" placeholder="Description (optionnel)" />
+        <input name="model" placeholder="Modèle par défaut (optionnel)" />
+        <input name="variables" placeholder="Variables séparées par virgule (ex: nom,ville)" />
+        <textarea name="template" placeholder="Template avec {{variables}}" rows="4" required></textarea>
+        <button type="submit">Créer</button>
+      </form>
+      <form id="form-run-prompt" class="form-grid">
+        <h3>Exécuter un prompt</h3>
+        <input name="prompt_id" placeholder="ID du prompt" required />
+        <input name="model" placeholder="Modèle (optionnel, sinon celui du prompt)" />
+        <textarea name="variables_json" placeholder='Variables en JSON (ex: {"nom":"Ada"})' rows="3"></textarea>
+        <button type="submit">Exécuter</button>
+      </form>
+      <div id="output-prompts" class="output"></div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
