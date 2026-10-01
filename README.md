@@ -17,6 +17,12 @@ Renseignez dans `.env` :
 - `LITELLM_MASTER_KEY` : la master key (ou clé admin) du proxy LiteLLM.
 - `APP_API_KEY` : clé pour protéger l'accès à ce serveur (fortement recommandé).
 
+Pour générer une clé aléatoire de 64 caractères (hexadécimal) pour `APP_API_KEY` :
+
+```bash
+openssl rand -hex 32
+```
+
 ## Démarrage
 
 ```bash
